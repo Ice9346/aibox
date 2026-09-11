@@ -16,8 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-KNOWLEDGE_FILE = "latest_lesson.json"
-LOGS_FILE = "question_logs.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+KNOWLEDGE_FILE = os.path.join(BASE_DIR, "latest_lesson.json")
+LOGS_FILE = os.path.join(BASE_DIR, "question_logs.json")
 
 embed_model = None
 
@@ -39,7 +40,7 @@ def read_root():
 
 @app.post("/upload_pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    temp_path = f"temp_{file.filename}"
+    temp_path = os.path.join(BASE_DIR, f"temp_{file.filename}")
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 

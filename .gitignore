@@ -1,7 +1,25 @@
+# Python & Environments
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .env
-latest_lesson.json
-question_logs.json
+aibox_env/
+venv/
+ENV/
+
+# System
+.DS_Store
+
+# Temporary & Runtime data
 temp_*
+**/temp_*
+latest_lesson.json
+**/latest_lesson.json
+question_logs.json
+**/question_logs.json
+synced_lesson.json
+**/synced_lesson.json
+
+# Test data (large files)
 sample.pdf
+data/sample.pdf
