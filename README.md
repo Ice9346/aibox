@@ -8,30 +8,31 @@
 
 ```mermaid
 graph LR
-    subgraph Teacher / Web Dashboard
-        Dashboard[Frontend Dashboard บน Vercel]
+    subgraph UI ["Teacher / Web Dashboard"]
+        Dashboard["Frontend Dashboard บน Vercel"]
     end
 
-    subgraph Cloud Backend (Railway)
-        FastAPI[FastAPI Server]
-        FastEmbed[FastEmbed ONNX]
-        LessonStore[(latest_lesson.json)]
-        LogStore[(question_logs.json)]
+    subgraph Cloud ["Cloud Backend (Railway)"]
+        FastAPI["FastAPI Server"]
+        FastEmbed["FastEmbed ONNX"]
+        LessonStore[("latest_lesson.json")]
+        LogStore[("question_logs.json")]
     end
 
-    subgraph Edge AI Box (Jetson Orin Nano / VM)
-        SyncScript[edge/sync_and_ask.py]
-        LocalVector[(edge/synced_lesson.json)]
-        Ollama[Ollama: qwen2.5:3b]
+    subgraph Edge ["Edge AI Box (Jetson Orin Nano / VM)"]
+        SyncScript["edge/sync_and_ask.py"]
+        LocalVector[("edge/synced_lesson.json")]
+        Ollama["Ollama: qwen2.5:3b"]
     end
 
-    Dashboard -->|POST /upload_pdf| FastAPI
-    Dashboard -->|GET /view_logs| FastAPI
-    FastAPI --> FastEmbed --> LessonStore
-    SyncScript -->|GET /check_version & /download_lesson| LessonStore
+    Dashboard -->|"POST /upload_pdf"| FastAPI
+    Dashboard -->|"GET /view_logs"| FastAPI
+    FastAPI --> FastEmbed
+    FastEmbed --> LessonStore
+    SyncScript -->|"GET /check_version & /download_lesson"| LessonStore
     SyncScript --> LocalVector
     LocalVector --> Ollama
-    SyncScript -->|POST /log_question| LogStore
+    SyncScript -->|"POST /log_question"| LogStore
 ```
 
 ---
