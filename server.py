@@ -3,13 +3,11 @@ import os
 import shutil
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-import fitz  # PyMuPDF
+import pymupdf  # ใช้ pymupdf แทน fitz
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
 
 app = FastAPI()
 
-# เปิด CORS เพื่อให้หน้าเว็บจาก Vercel ส่งข้อมูลเข้ามาได้
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,9 +19,18 @@ app.add_middleware(
 KNOWLEDGE_FILE = "latest_lesson.json"
 LOGS_FILE = "question_logs.json"
 
-# โหลดโมเดล Embedding มารอไว้บน RAM ของ Server
-print("⏳ โหลดโมเดล Embedding...")
-embedder = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+# ตัวแปรเก็บโมเดล (จะยังไม่โหลดตอนเปิดเครื่องเพื่อประหยัด RAM)
+embedder = None
+
+
+def get_embedder():
+  global embedder
+  if embedder is None:
+    print("⏳ เริ่มโหลดโมเดล Embedding เข้า RAM...")
+    from sentence_transformers import SentenceTransformer
+
+    embedder = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+  return embedder
 
 
 class LogEntry(BaseModel):
@@ -31,7 +38,9 @@ class LogEntry(BaseModel):
   answer: str
 
 
-# --- API สำหรับอาจารย์ (ผ่านเว็บ Vercel) ---
+@app.get("/")
+def read_root():
+  return {"status": "online", "message": "AI Learning Box Backend is Ready"}
 
 
 @app.post("/upload_pdf")
@@ -41,10 +50,11 @@ async def upload_pdf(file: UploadFile = File(...)):
     shutil.copyfileobj(file.file, buffer)
 
   # 1. สกัดข้อความจาก PDF
-  doc = fitz.open(temp_path)
+  doc = pymupdf.open(temp_path)
   full_text = "".join([page.get_text() for page in doc])
   doc.close()
-  os.remove(temp_path)
+  if os.path.exists(temp_path):
+    os.remove(temp_path)
 
   # 2. หั่นข้อความเป็นท่อนๆ
   chunk_size = 350
@@ -55,10 +65,11 @@ async def upload_pdf(file: UploadFile = File(...)):
     if len(c) > 30:
       chunks.append(c)
 
-  # 3. แปลงเป็น Vector
-  embeddings = embedder.encode(chunks, show_progress_bar=False).tolist()
+  # 3. โหลดโมเดลเฉพาะตอนใช้งาน และแปลงเป็น Vector
+  model = get_embedder()
+  embeddings = model.encode(chunks, show_progress_bar=False).tolist()
 
-  # 4. อัปเดตเวอร์ชันและเซฟลงไฟล์ JSON
+  # 4. อัปเดตเวอร์ชันและบันทึกลงไฟล์ JSON
   current_version = 1
   if os.path.exists(KNOWLEDGE_FILE):
     try:
@@ -84,19 +95,14 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.get("/view_logs")
 async def view_logs():
-  """ให้อาจารย์เปิดดูประวัติคำถามที่เด็กถาม"""
   if os.path.exists(LOGS_FILE):
     with open(LOGS_FILE, "r", encoding="utf-8") as f:
       return json.load(f)
   return []
 
 
-# --- API สำหรับกล่อง Jetson Orin Nano ---
-
-
 @app.get("/check_version")
 async def check_version():
-  """กล่องจะยิงมาถามบ่อยๆ ว่ามีบทเรียนใหม่ไหม"""
   if os.path.exists(KNOWLEDGE_FILE):
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
       data = json.load(f)
@@ -106,7 +112,6 @@ async def check_version():
 
 @app.get("/download_lesson")
 async def download_lesson():
-  """กล่องดาวน์โหลดข้อมูล Vector ทั้งก้อนไปเซฟลง SSD"""
   if os.path.exists(KNOWLEDGE_FILE):
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
       return json.load(f)
@@ -115,7 +120,6 @@ async def download_lesson():
 
 @app.post("/log_question")
 async def log_question(entry: LogEntry):
-  """กล่องส่งประวัติคำถาม-คำตอบกลับมาบันทึกบน Server"""
   logs = []
   if os.path.exists(LOGS_FILE):
     try:
