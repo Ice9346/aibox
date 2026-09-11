@@ -56,6 +56,7 @@ aibox/
 ├── data/                     # 📂 ตัวอย่างข้อมูล
 │   └── sample.pdf            # ตัวอย่างไฟล์ PDF สำหรับทดสอบระบบ
 │
+├── server.py                 # Entrypoint หลักสำหรับ Railway (เชื่อมต่อไปที่ backend/server.py)
 ├── Procfile                  # ไฟล์สั่งรันสำหรับ Railway
 ├── requirements.txt          # Root requirements สำหรับ Railway deployment
 ├── .gitignore                # การละเว้นไฟล์ temp, cache และ local runtime json
