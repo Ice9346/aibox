@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบอัปโหลดบทเรียนสำหรับคุณครู</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-8">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
+    <h1 class="text-xl font-bold mb-4">อัปโหลดชีตสอน (PDF)</h1>
+    
+    <!-- ฟอร์มเลือกไฟล์ -->
+    <input type="file" id="pdfFile" accept="application/pdf" class="mb-4 block w-full text-sm">
+    
+    <!-- ปุ่มกดส่ง -->
+    <button onclick="uploadPDF()" id="uploadBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium">
+      ส่งข้อมูลเข้ากล่อง AI
+    </button>
+    <p id="status" class="mt-4 text-sm text-gray-600"></p>
+  </div>
+
+  <script>
+    // ชี้เป้าไปที่ URL ของ Railway หลังบ้านที่เราสร้างไว้
+    const BACKEND_URL = "https://your-project-name.up.railway.app";
+
+    async function uploadPDF() {
+      const fileInput = document.getElementById("pdfFile");
+      const status = document.getElementById("status");
+      
+      if (!fileInput.files[0]) {
+        alert("กรุณาเลือกไฟล์ PDF ก่อนครับ");
+        return;
+      }
+
+      status.innerText = "กำลังประมวลผลและสร้าง Vector...";
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      try {
+        // ยิงส่งไฟล์ข้ามไปหา Railway
+        const response = await fetch(`${BACKEND_URL}/upload_pdf`, {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+        status.innerText = `สำเร็จ! สร้างท่อนความรู้เรียบร้อย: ${result.total_chunks} ส่วน พร้อมให้กล่องดาวน์โหลด`;
+      } catch (error) {
+        status.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
+      }
+    }
+  </script>
+</body>
+</html>

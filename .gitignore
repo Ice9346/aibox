@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+latest_lesson.json
+question_logs.json
+temp_*
+sample.pdf
