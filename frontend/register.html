@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>สมัครสมาชิก | Learning Box</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .input-box {
+        transition: all 0.2s ease;
+      }
+
+      .input-box:focus {
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+    <!-- Register Card -->
+    <div class="w-full max-w-md">
+      <!-- Logo / Title -->
+      <div class="text-center mb-8">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black text-white text-2xl font-bold mb-4"
+        >
+          LB
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900">สร้างบัญชี</h1>
+
+        <p class="text-gray-500 mt-2">สร้างบัญชีสำหรับใช้งาน Learning Box</p>
+      </div>
+
+      <!-- Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <form id="registerForm">
+          <!-- First Name -->
+          <div class="mb-5">
+            <label
+              for="firstName"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              ชื่อ
+            </label>
+
+            <input
+              type="text"
+              id="firstName"
+              placeholder="กรอกชื่อ"
+              class="input-box w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-gray-200"
+              required
+            />
+          </div>
+
+          <!-- Last Name -->
+          <div class="mb-5">
+            <label
+              for="lastName"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              นามสกุล
+            </label>
+
+            <input
+              type="text"
+              id="lastName"
+              placeholder="กรอกนามสกุล"
+              class="input-box w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-gray-200"
+              required
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="mb-5">
+            <label
+              for="email"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              อีเมล
+            </label>
+
+            <input
+              type="email"
+              id="email"
+              placeholder="example@email.com"
+              class="input-box w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-gray-200"
+              required
+            />
+          </div>
+
+          <!-- Password -->
+          <div class="mb-5">
+            <label
+              for="password"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              รหัสผ่าน
+            </label>
+
+            <input
+              type="password"
+              id="password"
+              placeholder="กรอกรหัสผ่าน"
+              class="input-box w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-gray-200"
+              required
+            />
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-6">
+            <label
+              for="confirmPassword"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              ยืนยันรหัสผ่าน
+            </label>
+
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="กรอกรหัสผ่านอีกครั้ง"
+              class="input-box w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-gray-200"
+              required
+            />
+          </div>
+
+          <!-- Error / Success -->
+          <div
+            id="message"
+            class="hidden mb-5 px-4 py-3 rounded-xl text-sm"
+          ></div>
+
+          <!-- Register Button -->
+          <button
+            type="submit"
+            id="registerButton"
+            class="w-full bg-black text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition"
+          >
+            สมัครสมาชิก
+          </button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="text-center mt-6">
+          <span class="text-sm text-gray-500"> มีบัญชีอยู่แล้ว? </span>
+
+          <a
+            href="login.html"
+            class="text-sm font-semibold text-black hover:underline ml-1"
+          >
+            เข้าสู่ระบบ
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-xs text-gray-400 mt-6">Learning Box</p>
+    </div>
+
+    <!-- Authentication -->
+    <script src="auth.js"></script>
+
+    <!-- Register Script -->
+    <script>
+      const registerForm = document.getElementById("registerForm");
+
+      const message = document.getElementById("message");
+
+      const registerButton = document.getElementById("registerButton");
+
+      // ----------------------------------------------------
+      // แสดงข้อความ
+      // ----------------------------------------------------
+      function showMessage(text, type) {
+        message.textContent = text;
+
+        message.classList.remove(
+          "hidden",
+          "bg-red-50",
+          "text-red-600",
+          "bg-green-50",
+          "text-green-600",
+        );
+
+        if (type === "error") {
+          message.classList.add("bg-red-50", "text-red-600");
+        } else {
+          message.classList.add("bg-green-50", "text-green-600");
+        }
+      }
+
+      // ----------------------------------------------------
+      // Register
+      // ----------------------------------------------------
+      registerForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const firstName = document.getElementById("firstName").value;
+
+        const lastName = document.getElementById("lastName").value;
+
+        const email = document.getElementById("email").value;
+
+        const password = document.getElementById("password").value;
+
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        // ตรวจสอบ Password
+        if (password !== confirmPassword) {
+          showMessage("รหัสผ่านไม่ตรงกัน", "error");
+
+          return;
+        }
+
+        // Password ขั้นต่ำ
+        if (password.length < 6) {
+          showMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", "error");
+
+          return;
+        }
+
+        // ปิดปุ่มชั่วคราว
+        registerButton.disabled = true;
+
+        registerButton.textContent = "กำลังสมัครสมาชิก...";
+
+        // เรียก auth.js
+        const result = registerUser(firstName, lastName, email, password);
+
+        if (!result.success) {
+          showMessage(result.message, "error");
+
+          registerButton.disabled = false;
+
+          registerButton.textContent = "สมัครสมาชิก";
+
+          return;
+        }
+
+        // สมัครสำเร็จ
+        showMessage("สมัครสมาชิกสำเร็จ กำลังไปหน้าเข้าสู่ระบบ...", "success");
+
+        registerForm.reset();
+
+        // ไป Login หลังจาก 1 วินาที
+        setTimeout(function () {
+          window.location.href = "login.html";
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

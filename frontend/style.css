@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f6f2;
+  color: #111813;
+}
+
+.sidebar {
+  background: #0b110d;
+}
+
+.green-bg {
+  background: #72d34f;
+}
+
+.nav-active {
+  background: #26382b;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #dfe5df;
+  border-radius: 16px;
+}
+
+.file-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.upload-area {
+  border: 2px dashed #91a38f;
+  background: #f3f8ef;
+  transition: 0.2s;
+}
+
+.upload-area.dragover {
+  background: #e7f4df;
+  border-color: #72d34f;
+}
+
+.progress-track {
+  background: #d9e5d4;
+}
+
+.progress-fill {
+  background: #72d34f;
+  transition: width 0.15s ease;
+}
+
+.step-line {
+  background: #d4ddd1;
+}
+
+.step-line-active {
+  background: #72d34f;
+  transition: width 0.3s ease;
+}
+
+.step-active {
+  background: #72d34f;
+  color: white;
+}
+
+.step-current {
+  background: #edf7e9;
+  color: #4c9c35;
+  border: 3px solid #72d34f;
+  box-shadow: 0 0 0 3px #dff2d8;
+}
+
+.step-wait {
+  background: #dedfdf;
+  color: #555;
+}
+
+.status-processing {
+  background: #c8f5c7;
+  color: #31772b;
+}
+
+.status-ready {
+  background: #e6f6df;
+  color: #438331;
+}
+
+.status-error {
+  background: #fde4e4;
+  color: #b42323;
+}
+
+.empty-state {
+  color: #9aa39b;
+}
+
+button {
+  transition: 0.2s;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .main-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  .process-file-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

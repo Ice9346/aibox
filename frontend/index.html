@@ -1,0 +1,1784 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI Learning Box — Teacher Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="min-h-screen flex">
+      <!-- =========================================================
+       SIDEBAR
+  ========================================================== -->
+
+      <aside
+        class="sidebar w-[242px] min-h-screen text-white flex flex-col px-3 py-5"
+      >
+        <!-- Logo -->
+        <div class="px-2 pb-5 border-b border-[#263129]">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 rounded-lg green-bg flex items-center justify-center text-black font-bold"
+            >
+              AI
+            </div>
+
+            <div>
+              <div class="font-bold text-lg leading-none">Learning Box</div>
+
+              <div class="text-[8px] text-gray-400 mt-1">
+                KNOWLEDGE, CLARIFIED
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+
+        <nav class="mt-5 space-y-2">
+          <button
+            id="navDashboard"
+            onclick="showPage('dashboard')"
+            class="nav-active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[15px]"
+          >
+            <span>◉</span>
+            <span>ภาพรวม</span>
+          </button>
+
+          <button
+            id="navLibrary"
+            onclick="showPage('library')"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[15px] hover:bg-[#182219]"
+          >
+            <span>▣</span>
+            <span>คลังเนื้อหา</span>
+          </button>
+
+          <button
+            id="navLogs"
+            onclick="showPage('logs')"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[15px] hover:bg-[#182219]"
+          >
+            <span>☷</span>
+            <span>Question logs</span>
+          </button>
+        </nav>
+
+        <!-- Server Status & Test Connection -->
+        <div class="mt-auto pt-4 border-t border-[#263129] px-2 mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <span
+              class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
+            >
+              เซิร์ฟเวอร์
+            </span>
+
+            <button
+              type="button"
+              id="btnTestServer"
+              onclick="checkServerHealth()"
+              class="text-[11px] text-green-400 hover:text-green-300 transition flex items-center gap-1 font-medium bg-[#19271c] hover:bg-[#203424] px-2 py-1 rounded-lg border border-[#283d2c] cursor-pointer active:scale-95"
+              title="กดเพื่อทดสอบการเชื่อมต่อเซิร์ฟเวอร์"
+            >
+              <span>🔄</span>
+              <span>เทสเชื่อมต่อ</span>
+            </button>
+          </div>
+
+          <div
+            id="serverStatusCard"
+            class="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#141e17] border border-[#233326] transition-all"
+          >
+            <div
+              id="serverStatusDot"
+              class="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0 animate-pulse"
+            ></div>
+
+            <div class="min-w-0 flex-1">
+              <div
+                id="serverStatusTitle"
+                class="text-xs font-semibold text-gray-200 truncate"
+              >
+                กำลังตรวจสถานะ...
+              </div>
+              <div
+                id="serverStatusDetail"
+                class="text-[10px] text-gray-400 truncate mt-0.5"
+              >
+                กำลังทดสอบ API
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teacher Information -->
+
+        <div class="pt-4 border-t border-[#263129] px-2">
+          <div id="currentUserName" class="text-sm font-semibold">
+            กำลังโหลด...
+          </div>
+
+          <div id="currentUserInfo" class="text-xs text-gray-400 mt-1">
+            กำลังโหลด...
+          </div>
+
+          <!-- Logout Button -->
+          <button
+            type="button"
+            onclick="handleLogout()"
+            class="mt-4 w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-400 hover:text-white hover:bg-[#263129] transition"
+          >
+            <span>↪</span>
+            <span>ออกจากระบบ</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- =========================================================
+       MAIN CONTENT
+  ========================================================== -->
+
+      <main class="flex-1 min-w-0">
+        <!-- =======================================================
+         DASHBOARD
+    ======================================================== -->
+
+        <section
+          id="dashboardPage"
+          class="page main-content max-w-[1200px] mx-auto px-8 py-9"
+        >
+          <div class="text-[11px] text-gray-500 uppercase tracking-wide">
+            COMPUTER SCIENCE · CPE 67132
+          </div>
+
+          <h1 class="text-3xl font-bold mt-1">ภาพรวมรายวิชา</h1>
+
+          <!-- =========================
+           STATISTICS
+      ========================== -->
+
+          <div class="stats-grid grid grid-cols-3 gap-3 mt-5">
+            <!-- Documents -->
+
+            <div class="card p-4">
+              <div class="text-xs text-gray-500">เอกสารในคลัง</div>
+
+              <div id="documentCount" class="text-3xl font-bold mt-1">0</div>
+
+              <div id="documentSubtext" class="text-xs text-green-700 mt-2">
+                ยังไม่มีเอกสาร
+              </div>
+            </div>
+
+            <!-- Questions -->
+
+            <div class="card p-4">
+              <div class="text-xs text-gray-500">คำถามที่มีคนถาม</div>
+
+              <div id="questionCount" class="text-3xl font-bold mt-1">0</div>
+
+              <div id="questionSubtext" class="text-xs text-green-700 mt-2">
+                ยังไม่มีคำถาม
+              </div>
+            </div>
+
+            <!-- Students -->
+
+            <div class="card p-4">
+              <div class="text-xs text-gray-500">นักเรียนที่ใช้งาน</div>
+
+              <div id="studentCount" class="text-3xl font-bold mt-1">0</div>
+
+              <div id="studentSubtext" class="text-xs text-gray-500 mt-2">
+                ยังไม่มีข้อมูลนักเรียน
+              </div>
+            </div>
+          </div>
+
+          <!-- =========================
+           CONTENT AREA
+      ========================== -->
+
+          <div class="dashboard-grid grid grid-cols-[1.7fr_1fr] gap-3 mt-4">
+            <!-- Latest Content -->
+
+            <div class="card p-5">
+              <h2 class="text-xl font-bold">เนื้อหาล่าสุด</h2>
+
+              <p class="text-xs text-gray-500 mt-1">
+                แหล่งข้อมูลที่ AI ใช้เพื่อค้นคำตอบ
+              </p>
+
+              <div id="latestContent" class="mt-5"></div>
+            </div>
+
+            <!-- Frequently Asked Questions -->
+
+            <div class="card p-5">
+              <h2 class="text-xl font-bold">คำถามที่พบบ่อย</h2>
+
+              <p class="text-xs text-gray-500 mt-1">
+                เพื่อช่วยประเมินคำถามการสอน
+              </p>
+
+              <div id="faqContent" class="mt-5"></div>
+
+              <button
+                onclick="showPage('logs')"
+                class="mt-7 bg-[#0c130e] text-white px-4 py-2.5 rounded-lg text-xs"
+              >
+                ▣ เปิด Question logs
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- =======================================================
+         CONTENT LIBRARY
+    ======================================================== -->
+
+        <section
+          id="libraryPage"
+          class="page hidden main-content max-w-[1200px] mx-auto px-8 py-9"
+        >
+          <div class="text-[11px] text-gray-500 uppercase tracking-wide">
+            COMPUTER SCIENCE · CPE 67132
+          </div>
+
+          <h1 id="libraryTitle" class="text-3xl font-bold mt-1">คลังเนื้อหา</h1>
+
+          <p class="text-xs text-gray-500 mt-1">
+            จัดการเอกสารที่ AI ใช้ตอบคำถามในรายวิชา
+          </p>
+
+          <!-- =====================================================
+           NORMAL UPLOAD STATE
+      ====================================================== -->
+
+          <div id="uploadNormal" class="card p-5 mt-5">
+            <h2 class="font-bold text-lg">อัปโหลดเนื้อหาการสอน</h2>
+
+            <p class="text-xs text-gray-500 mt-1">
+              รองรับ PDF, PPTX, DOCX, TXT และไฟล์รูปภาพ
+            </p>
+
+            <!-- Drop Zone -->
+
+            <div
+              id="uploadArea"
+              class="upload-area rounded-2xl mt-4 h-[230px] flex flex-col items-center justify-center text-center"
+            >
+              <div
+                class="w-12 h-12 rounded-lg green-bg flex items-center justify-center text-black text-3xl"
+              >
+                ↓
+              </div>
+
+              <div class="font-semibold mt-3">ลากไฟล์มาวางที่นี่</div>
+
+              <div class="text-xs text-gray-500 mt-1">
+                หรือเลือกไฟล์จากคอมพิวเตอร์ · ขนาดสูงสุด 50 MB
+              </div>
+
+              <button
+                onclick="document.getElementById('fileInput').click()"
+                class="mt-3 bg-[#0b120d] text-white px-5 py-2 rounded-lg text-xs"
+              >
+                เลือกไฟล์
+              </button>
+
+              <input
+                id="fileInput"
+                type="file"
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.png,.jpg,.jpeg"
+                class="hidden"
+              />
+            </div>
+          </div>
+
+          <!-- =====================================================
+           UPLOAD PROCESS STATE
+      ====================================================== -->
+
+          <div id="uploadProcess" class="hidden">
+            <div class="card p-5 mt-5">
+              <h2 class="font-bold text-xl">กำลังเตรียมอัปโหลดเนื้อหาการสอน</h2>
+
+              <div
+                class="mt-3 rounded-2xl border border-gray-300 bg-[#f8faf6] p-6"
+              >
+                <!-- File Header -->
+
+                <div class="process-file-header flex items-center gap-4">
+                  <div
+                    id="processFileIcon"
+                    class="file-icon !w-14 !h-14 !text-sm bg-red-200 text-red-800"
+                  >
+                    PDF
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div
+                      id="processFileName"
+                      class="font-bold text-lg break-all"
+                    >
+                      กำลังอัปโหลดไฟล์...
+                    </div>
+
+                    <div
+                      id="processFileSize"
+                      class="text-sm text-gray-700 mt-1"
+                    >
+                      กำลังเตรียมไฟล์
+                    </div>
+                  </div>
+
+                  <div
+                    id="processStatus"
+                    class="status-processing px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap"
+                  >
+                    กำลังประมวลผล
+                  </div>
+                </div>
+
+                <!-- Progress Bar -->
+
+                <div class="mt-5">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex-1 h-3 progress-track rounded-full overflow-hidden"
+                    >
+                      <div
+                        id="uploadProgressBar"
+                        class="progress-fill h-full rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+
+                    <div
+                      id="uploadProgressText"
+                      class="font-semibold text-sm w-12 text-right"
+                    >
+                      0%
+                    </div>
+                  </div>
+                </div>
+
+                <!-- =================================================
+                 PROCESS STEPS
+            ================================================== -->
+
+                <div class="relative mt-12 mb-3">
+                  <!-- Background Line -->
+
+                  <div
+                    class="absolute top-5 left-[12%] right-[12%] h-[2px] step-line"
+                  ></div>
+
+                  <!-- Active Line -->
+
+                  <div
+                    id="stepLine"
+                    class="absolute top-5 left-[12%] h-[2px] step-line-active"
+                    style="width: 0%"
+                  ></div>
+
+                  <div class="relative grid grid-cols-3 text-center">
+                    <!-- STEP 1 -->
+
+                    <div>
+                      <div
+                        id="step1Circle"
+                        class="mx-auto w-10 h-10 rounded-full step-active flex items-center justify-center font-bold text-lg"
+                      >
+                        ✓
+                      </div>
+
+                      <div class="font-semibold text-sm mt-2">อัปโหลดไฟล์</div>
+                    </div>
+
+                    <!-- STEP 2 -->
+
+                    <div>
+                      <div
+                        id="step2Circle"
+                        class="mx-auto w-10 h-10 rounded-full step-current flex items-center justify-center font-bold text-lg"
+                      >
+                        2
+                      </div>
+
+                      <div class="font-semibold text-sm mt-2">
+                        กำลังแยกหัวข้อ
+                      </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+
+                    <div>
+                      <div
+                        id="step3Circle"
+                        class="mx-auto w-10 h-10 rounded-full step-wait flex items-center justify-center font-bold text-lg"
+                      >
+                        3
+                      </div>
+
+                      <div class="font-semibold text-sm mt-2">พร้อมใช้</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- =====================================================
+           FILE LIST
+      ====================================================== -->
+
+          <div id="fileListCard" class="card p-5 mt-5">
+            <h2 class="font-bold text-lg">ไฟล์ทั้งหมด</h2>
+
+            <div id="allFiles" class="mt-4"></div>
+          </div>
+        </section>
+
+        <!-- =======================================================
+         QUESTION LOGS
+    ======================================================== -->
+
+        <section
+          id="logsPage"
+          class="page hidden main-content max-w-[1200px] mx-auto px-8 py-9"
+        >
+          <div class="text-[11px] text-gray-500 uppercase tracking-wide">
+            COMPUTER SCIENCE · CPE 67132
+          </div>
+
+          <h1 class="text-3xl font-bold mt-1">Question logs</h1>
+
+          <p class="text-xs text-gray-500 mt-1">
+            ติดตามคำถามจากนักเรียน · CPE 67132
+          </p>
+
+          <div class="card p-5 mt-5">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">คำถามทั้งหมดจากนักเรียนในรายวิชา</div>
+
+              <button
+                onclick="loadLogs()"
+                class="bg-[#edf6e9] text-green-800 px-4 py-2 rounded-lg text-xs"
+              >
+                ↻ ดึงข้อมูลล่าสุด
+              </button>
+            </div>
+
+            <div id="logsTable" class="mt-5"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ===========================================================
+     JAVASCRIPT
+=========================================================== -->
+
+    <script>
+      /* ===========================================================
+     BACKEND URL
+  =========================================================== */
+
+      const BASE_URL = "http://127.0.0.1:8000";
+      //ถ้าใข้railway ให้เปลี่ยนเป็น
+      //"https://web-production-3eb56.up.railway.app"
+
+      /* ===========================================================
+     LOCAL FILE STORAGE
+     
+     v2 = ใช้แยกจากข้อมูลเก่า เพื่อไม่ให้ไฟล์ตัวอย่าง
+     ที่เคยอยู่ใน localStorage เช่น 24 ไฟล์ ถูกนำกลับมา
+  =========================================================== */
+
+      let uploadedFiles = [];
+
+      try {
+        uploadedFiles = JSON.parse(
+          localStorage.getItem("learningBoxFiles_v2") || "[]",
+        );
+
+        if (!Array.isArray(uploadedFiles)) {
+          uploadedFiles = [];
+        }
+      } catch (error) {
+        uploadedFiles = [];
+      }
+
+      function saveFiles() {
+        localStorage.setItem(
+          "learningBoxFiles_v2",
+          JSON.stringify(uploadedFiles),
+        );
+      }
+
+      /* ===========================================================
+     PAGE NAVIGATION
+  =========================================================== */
+
+      function showPage(page) {
+        document.querySelectorAll(".page").forEach((section) => {
+          section.classList.add("hidden");
+        });
+
+        const target = document.getElementById(page + "Page");
+
+        if (target) {
+          target.classList.remove("hidden");
+        }
+
+        document.querySelectorAll("nav button").forEach((button) => {
+          button.classList.remove("nav-active");
+        });
+
+        if (page === "dashboard") {
+          document.getElementById("navDashboard").classList.add("nav-active");
+
+          updateDashboard();
+        }
+
+        if (page === "library") {
+          document.getElementById("navLibrary").classList.add("nav-active");
+
+          renderFiles();
+        }
+
+        if (page === "logs") {
+          document.getElementById("navLogs").classList.add("nav-active");
+
+          loadLogs();
+        }
+      }
+
+      /* ===========================================================
+     FILE TYPE
+  =========================================================== */
+
+      function getFileType(filename) {
+        const extension = filename.split(".").pop().toLowerCase();
+
+        if (extension === "pdf") {
+          return {
+            type: "PDF",
+            class: "bg-red-200 text-red-900",
+          };
+        }
+
+        if (extension === "ppt" || extension === "pptx") {
+          return {
+            type: "PPT",
+            class: "bg-orange-200 text-orange-900",
+          };
+        }
+
+        if (extension === "doc" || extension === "docx") {
+          return {
+            type: "DOC",
+            class: "bg-blue-200 text-blue-900",
+          };
+        }
+
+        if (extension === "txt") {
+          return {
+            type: "TXT",
+            class: "bg-gray-200 text-gray-700",
+          };
+        }
+
+        return {
+          type: extension.toUpperCase(),
+          class: "bg-gray-200 text-gray-700",
+        };
+      }
+
+      /* ===========================================================
+     FILE SIZE
+  =========================================================== */
+
+      function formatFileSize(bytes) {
+        if (!bytes || bytes <= 0) {
+          return "0 KB";
+        }
+
+        const mb = bytes / (1024 * 1024);
+
+        if (mb < 1) {
+          return (bytes / 1024).toFixed(1) + " KB";
+        }
+
+        return mb.toFixed(1) + " MB";
+      }
+
+      /* ===========================================================
+     DATE
+  =========================================================== */
+
+      function formatDate(date) {
+        if (!date) {
+          return "-";
+        }
+
+        try {
+          const d = new Date(date);
+
+          const dateStr = d.toLocaleDateString("th-TH", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+
+          const timeStr = d.toLocaleTimeString("th-TH", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          return `${dateStr} เวลา ${timeStr} น.`;
+        } catch (error) {
+          return "-";
+        }
+      }
+
+      /* ===========================================================
+     ESCAPE HTML
+  =========================================================== */
+
+      function escapeHTML(value) {
+        const div = document.createElement("div");
+
+        div.textContent = value == null ? "" : String(value);
+
+        return div.innerHTML;
+      }
+
+      /* ===========================================================
+     CREATE FILE HTML
+  =========================================================== */
+
+      function createFileHTML(file) {
+        const icon = getFileType(file.name);
+
+        return `
+
+      <div
+        class="flex items-center
+               justify-between
+               py-4
+               border-b
+               border-gray-100"
+      >
+
+        <div
+          class="flex items-center gap-3
+                 min-w-0"
+        >
+
+          <div
+            class="file-icon ${icon.class}"
+          >
+            ${icon.type}
+          </div>
+
+
+          <div class="min-w-0">
+
+            <div
+              class="font-semibold
+                     text-sm
+                     break-all"
+            >
+              ${escapeHTML(file.name)}
+            </div>
+
+
+            <div
+              class="text-xs
+                     text-gray-400
+                     mt-1"
+            >
+              ${file.chunks ? file.chunks + " chunks · " : ""}
+              อัปโหลดเมื่อ
+              ${formatDate(file.date)}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <span
+          class="status-ready
+                 px-3 py-1
+                 rounded-full
+                 text-xs
+                 whitespace-nowrap
+                 ml-3"
+        >
+          พร้อมใช้
+        </span>
+
+      </div>
+
+    `;
+      }
+
+      /* ===========================================================
+     RENDER FILE LIST
+  =========================================================== */
+
+      function renderFiles() {
+        const container = document.getElementById("allFiles");
+
+        if (!uploadedFiles.length) {
+          container.innerHTML = `
+
+        <div
+          class="empty-state
+                 text-center
+                 py-16"
+        >
+
+          <div
+            class="text-4xl
+                   mb-3"
+          >
+            📁
+          </div>
+
+
+          <div
+            class="font-semibold
+                   text-gray-500"
+          >
+            ยังไม่มีไฟล์
+          </div>
+
+
+          <div
+            class="text-xs
+                   mt-1"
+          >
+            อัปโหลดเอกสารการสอน
+            เพื่อเริ่มต้นใช้งาน
+          </div>
+
+        </div>
+
+      `;
+
+          return;
+        }
+
+        container.innerHTML = uploadedFiles
+          .slice()
+          .reverse()
+          .map(createFileHTML)
+          .join("");
+      }
+
+      /* ===========================================================
+     LATEST CONTENT
+  =========================================================== */
+
+      function renderLatestContent() {
+        const container = document.getElementById("latestContent");
+
+        if (!uploadedFiles.length) {
+          container.innerHTML = `
+
+        <div
+          class="empty-state
+                 text-center
+                 py-14"
+        >
+
+          <div
+            class="text-4xl
+                   mb-3"
+          >
+            📄
+          </div>
+
+
+          <div
+            class="font-semibold
+                   text-gray-500"
+          >
+            ยังไม่มีเนื้อหา
+          </div>
+
+
+          <div
+            class="text-xs
+                   mt-1"
+          >
+            อัปโหลดเอกสาร
+            เพื่อให้ AI เริ่มเรียนรู้
+          </div>
+
+
+          <button
+            onclick="showPage('library')"
+            class="mt-4
+                   bg-[#0b120d]
+                   text-white
+                   px-4 py-2
+                   rounded-lg
+                   text-xs"
+          >
+            ไปที่คลังเนื้อหา
+          </button>
+
+        </div>
+
+      `;
+
+          return;
+        }
+
+        container.innerHTML = uploadedFiles
+          .slice()
+          .reverse()
+          .slice(0, 5)
+          .map(createFileHTML)
+          .join("");
+      }
+
+      /* ===========================================================
+     FAQ
+  =========================================================== */
+
+      function renderFAQ(logs) {
+        const container = document.getElementById("faqContent");
+
+        if (!logs || !logs.length) {
+          container.innerHTML = `
+
+        <div
+          class="empty-state
+                 text-center
+                 py-14"
+        >
+
+          <div
+            class="text-4xl
+                   mb-3"
+          >
+            💬
+          </div>
+
+
+          <div
+            class="font-semibold
+                   text-gray-500"
+          >
+            ยังไม่มีคำถาม
+          </div>
+
+
+          <div
+            class="text-xs
+                   mt-1"
+          >
+            เมื่อมีนักเรียนถาม
+            คำถามจะปรากฏที่นี่
+          </div>
+
+        </div>
+
+      `;
+
+          return;
+        }
+
+        const questions = logs.slice().reverse().slice(0, 3);
+
+        container.innerHTML = questions
+          .map((log, index) => {
+            const question = log.question || log.query || "ไม่มีคำถาม";
+
+            return `
+
+              <div
+                class="py-4
+                       border-b
+                       border-gray-100"
+              >
+
+                <div
+                  class="text-sm
+                         font-semibold"
+                >
+                  ${escapeHTML(question)}
+                </div>
+
+
+                <div
+                  class="text-xs
+                         text-gray-400
+                         mt-2"
+                >
+                  ถามครั้งที่
+                  ${logs.length - index}
+                </div>
+
+              </div>
+
+            `;
+          })
+          .join("");
+      }
+
+      /* ===========================================================
+     UPDATE DASHBOARD
+  =========================================================== */
+
+      async function updateDashboard() {
+        const documentCount = document.getElementById("documentCount");
+
+        const documentSubtext = document.getElementById("documentSubtext");
+
+        const questionCount = document.getElementById("questionCount");
+
+        const questionSubtext = document.getElementById("questionSubtext");
+
+        /* Documents */
+
+        documentCount.innerText = uploadedFiles.length;
+
+        if (uploadedFiles.length === 0) {
+          documentSubtext.innerText = "ยังไม่มีเอกสาร";
+        } else {
+          documentSubtext.innerText = `${uploadedFiles.length} ไฟล์ในคลัง`;
+        }
+
+        /* Students: ยังไม่มี API นักเรียน */
+
+        const studentCount = document.getElementById("studentCount");
+
+        const studentSubtext = document.getElementById("studentSubtext");
+
+        if (studentCount) {
+          studentCount.innerText = "0";
+        }
+
+        if (studentSubtext) {
+          studentSubtext.innerText = "ยังไม่มีข้อมูลนักเรียน";
+        }
+
+        /* Default */
+
+        questionCount.innerText = "0";
+
+        questionSubtext.innerText = "กำลังตรวจสอบข้อมูล";
+
+        renderLatestContent();
+
+        renderFAQ([]);
+
+        /* Load Question Logs */
+
+        try {
+          const response = await fetch(`${BASE_URL}/view_logs`);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const logs = await response.json();
+
+          const safeLogs = Array.isArray(logs) ? logs : [];
+
+          questionCount.innerText = safeLogs.length;
+
+          questionSubtext.innerText =
+            safeLogs.length === 0
+              ? "ยังไม่มีคำถาม"
+              : `${safeLogs.length} คำถาม`;
+
+          renderFAQ(safeLogs);
+        } catch (error) {
+          console.log("ไม่สามารถโหลด Question logs", error);
+
+          questionCount.innerText = "0";
+
+          questionSubtext.innerText = "ยังไม่มีข้อมูล";
+
+          renderFAQ([]);
+        }
+      }
+
+      /* ===========================================================
+     SHOW UPLOAD PROCESS
+  =========================================================== */
+
+      function showUploadProcess(file) {
+        const normal = document.getElementById("uploadNormal");
+
+        const process = document.getElementById("uploadProcess");
+
+        const fileList = document.getElementById("fileListCard");
+
+        const title = document.getElementById("libraryTitle");
+
+        normal.classList.add("hidden");
+
+        fileList.classList.add("hidden");
+
+        process.classList.remove("hidden");
+
+        title.innerText = "คลังเนื้อหา · กำลังอัปโหลด";
+
+        /* File information */
+
+        const info = getFileType(file.name);
+
+        const icon = document.getElementById("processFileIcon");
+
+        icon.innerText = info.type;
+
+        icon.className = `file-icon
+       !w-14 !h-14
+       !text-sm
+       ${info.class}`;
+
+        document.getElementById("processFileName").innerText = file.name;
+
+        document.getElementById("processFileSize").innerText =
+          `${formatFileSize(file.size)} · กำลังอัปโหลด`;
+
+        /* Reset status */
+
+        document.getElementById("processStatus").innerText = "กำลังประมวลผล";
+
+        document.getElementById("processStatus").className =
+          "status-processing px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap";
+
+        /* Reset progress */
+
+        setProgress(0);
+
+        setStepState("uploading");
+      }
+
+      /* ===========================================================
+     SET PROGRESS
+  =========================================================== */
+
+      function setProgress(value) {
+        const safeValue = Math.max(0, Math.min(100, Math.round(value)));
+
+        document.getElementById("uploadProgressBar").style.width =
+          safeValue + "%";
+
+        document.getElementById("uploadProgressText").innerText =
+          safeValue + "%";
+
+        let lineWidth = 0;
+
+        if (safeValue >= 100) {
+          lineWidth = 100;
+        } else if (safeValue >= 68) {
+          lineWidth = 70;
+        } else if (safeValue >= 30) {
+          lineWidth = 35;
+        }
+
+        document.getElementById("stepLine").style.width = lineWidth + "%";
+      }
+
+      /* ===========================================================
+     STEP STATE
+  =========================================================== */
+
+      function setStepState(state) {
+        const step1 = document.getElementById("step1Circle");
+
+        const step2 = document.getElementById("step2Circle");
+
+        const step3 = document.getElementById("step3Circle");
+
+        /* Reset */
+
+        step1.className =
+          "mx-auto w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg";
+
+        step2.className =
+          "mx-auto w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg";
+
+        step3.className =
+          "mx-auto w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg";
+
+        if (state === "uploading") {
+          step1.classList.add("step-active");
+
+          step1.innerText = "✓";
+
+          step2.classList.add("step-current");
+
+          step2.innerText = "2";
+
+          step3.classList.add("step-wait");
+
+          step3.innerText = "3";
+        }
+
+        if (state === "processing") {
+          step1.classList.add("step-active");
+
+          step1.innerText = "✓";
+
+          step2.classList.add("step-current");
+
+          step2.innerText = "2";
+
+          step3.classList.add("step-wait");
+
+          step3.innerText = "3";
+        }
+
+        if (state === "ready") {
+          step1.classList.add("step-active");
+
+          step1.innerText = "✓";
+
+          step2.classList.add("step-active");
+
+          step2.innerText = "✓";
+
+          step3.classList.add("step-active");
+
+          step3.innerText = "✓";
+        }
+      }
+
+      /* ===========================================================
+     UPLOAD FILE
+  =========================================================== */
+
+      function uploadPDF(file) {
+        if (!file) {
+          alert("กรุณาเลือกไฟล์ก่อนครับ");
+
+          return;
+        }
+
+        /* 50 MB limit */
+
+        const maxSize = 50 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+          alert("ไฟล์มีขนาดเกิน 50 MB");
+
+          return;
+        }
+
+        showUploadProcess(file);
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+        /*
+      XMLHttpRequest ใช้เพื่อแสดง
+      Upload Progress แบบ Real-time
+    */
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.open("POST", `${BASE_URL}/upload_pdf`, true);
+
+        /* =====================================================
+       REAL UPLOAD PROGRESS
+    ====================================================== */
+
+        xhr.upload.addEventListener("progress", function (event) {
+          if (!event.lengthComputable) {
+            return;
+          }
+
+          const uploadPercent = (event.loaded / event.total) * 100;
+
+          /*
+          Upload stage = 0-68%
+        */
+
+          const visualPercent = uploadPercent * 0.68;
+
+          setProgress(visualPercent);
+
+          document.getElementById("processFileSize").innerText =
+            `${formatFileSize(file.size)} · อัปโหลด ${Math.round(uploadPercent)}%`;
+        });
+
+        /* =====================================================
+       REQUEST STARTED
+    ====================================================== */
+
+        xhr.onloadstart = function () {
+          setStepState("uploading");
+        };
+
+        /* =====================================================
+       RESPONSE
+    ====================================================== */
+
+        xhr.onload = function () {
+          if (xhr.status < 200 || xhr.status >= 300) {
+            handleUploadError(`HTTP ${xhr.status}`);
+
+            return;
+          }
+
+          let data = {};
+
+          try {
+            data = JSON.parse(xhr.responseText);
+          } catch (error) {
+            data = {};
+          }
+
+          /* ==============================
+           Processing stage
+        ============================== */
+
+          setProgress(68);
+
+          setStepState("processing");
+
+          document.getElementById("processStatus").innerText = "กำลังประมวลผล";
+
+          document.getElementById("processFileSize").innerText =
+            `${formatFileSize(file.size)} · กำลังแยกหัวข้อ`;
+
+          /*
+          Animate 68% -> 94%
+          เพื่อให้ผู้ใช้เห็นว่าระบบกำลังประมวลผล
+        */
+
+          let processingProgress = 68;
+
+          const processingTimer = setInterval(function () {
+            if (processingProgress < 94) {
+              processingProgress += 1;
+
+              setProgress(processingProgress);
+            }
+          }, 100);
+
+          /*
+          Backend response กลับมาแล้ว
+          จึงแสดง Ready
+        */
+
+          setTimeout(function () {
+            clearInterval(processingTimer);
+
+            setProgress(100);
+
+            setStepState("ready");
+
+            document.getElementById("processStatus").innerText = "พร้อมใช้";
+
+            document.getElementById("processStatus").className =
+              "status-ready px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap";
+
+            document.getElementById("processFileSize").innerText =
+              `${formatFileSize(file.size)} · ประมวลผลแล้ว`;
+
+            /* ==========================
+               Save file
+            =========================== */
+
+            uploadedFiles.push({
+              name: file.name,
+
+              size: file.size,
+
+              date: new Date().toISOString(),
+
+              version: data.version || null,
+
+              chunks: data.chunks || 0,
+            });
+
+            saveFiles();
+
+            /*
+              แสดง Ready ให้ผู้ใช้เห็นก่อน
+              กลับไปหน้า Library
+            */
+
+            setTimeout(function () {
+              finishUpload();
+            }, 1200);
+          }, 700);
+        };
+
+        /* =====================================================
+       NETWORK ERROR
+    ====================================================== */
+
+        xhr.onerror = function () {
+          handleUploadError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+        };
+
+        /* =====================================================
+       REQUEST ABORTED
+    ====================================================== */
+
+        xhr.onabort = function () {
+          handleUploadError("การอัปโหลดถูกยกเลิก");
+        };
+
+        xhr.send(formData);
+      }
+
+      /* ===========================================================
+     UPLOAD ERROR
+  =========================================================== */
+
+      function handleUploadError(message) {
+        setProgress(0);
+
+        document.getElementById("processStatus").innerText = "เกิดข้อผิดพลาด";
+
+        document.getElementById("processStatus").className =
+          "status-error px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap";
+
+        document.getElementById("processFileSize").innerText = message;
+
+        setTimeout(function () {
+          const normal = document.getElementById("uploadNormal");
+
+          const process = document.getElementById("uploadProcess");
+
+          const fileList = document.getElementById("fileListCard");
+
+          const title = document.getElementById("libraryTitle");
+
+          process.classList.add("hidden");
+
+          normal.classList.remove("hidden");
+
+          fileList.classList.remove("hidden");
+
+          title.innerText = "คลังเนื้อหา";
+        }, 2000);
+      }
+
+      /* ===========================================================
+     FINISH UPLOAD
+  =========================================================== */
+
+      function finishUpload() {
+        const normal = document.getElementById("uploadNormal");
+
+        const process = document.getElementById("uploadProcess");
+
+        const fileList = document.getElementById("fileListCard");
+
+        const title = document.getElementById("libraryTitle");
+
+        process.classList.add("hidden");
+
+        normal.classList.remove("hidden");
+
+        fileList.classList.remove("hidden");
+
+        title.innerText = "คลังเนื้อหา";
+
+        renderFiles();
+
+        updateDashboard();
+
+        document.getElementById("fileInput").value = "";
+      }
+
+      /* ===========================================================
+     FILE INPUT
+  =========================================================== */
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function () {
+          if (this.files && this.files.length > 0) {
+            uploadPDF(this.files[0]);
+          }
+        });
+
+      /* ===========================================================
+     DRAG & DROP
+  =========================================================== */
+
+      const uploadArea = document.getElementById("uploadArea");
+
+      uploadArea.addEventListener("dragover", function (event) {
+        event.preventDefault();
+
+        uploadArea.classList.add("dragover");
+      });
+
+      uploadArea.addEventListener("dragleave", function () {
+        uploadArea.classList.remove("dragover");
+      });
+
+      uploadArea.addEventListener("drop", function (event) {
+        event.preventDefault();
+
+        uploadArea.classList.remove("dragover");
+
+        const files = event.dataTransfer.files;
+
+        if (files && files.length > 0) {
+          uploadPDF(files[0]);
+        }
+      });
+
+      /* ===========================================================
+     QUESTION LOGS
+  =========================================================== */
+
+      async function loadLogs() {
+        const container = document.getElementById("logsTable");
+
+        container.innerHTML = `
+
+      <div
+        class="text-center
+               py-10
+               text-gray-400"
+      >
+        กำลังโหลดข้อมูล...
+      </div>
+
+    `;
+
+        try {
+          const response = await fetch(`${BASE_URL}/view_logs`);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          const logs = Array.isArray(data) ? data : [];
+
+          /* Update dashboard count */
+
+          document.getElementById("questionCount").innerText = logs.length;
+
+          document.getElementById("questionSubtext").innerText =
+            logs.length === 0 ? "ยังไม่มีคำถาม" : `${logs.length} คำถาม`;
+
+          renderFAQ(logs);
+
+          /* No logs */
+
+          if (!logs.length) {
+            container.innerHTML = `
+
+          <div
+            class="text-center
+                   py-16
+                   text-gray-400"
+          >
+
+            <div
+              class="text-4xl
+                     mb-3"
+            >
+              💬
+            </div>
+
+
+            <div
+              class="font-semibold"
+            >
+              ยังไม่มีประวัติคำถาม
+            </div>
+
+
+            <div
+              class="text-xs
+                     mt-1"
+            >
+              เมื่อมีนักเรียนถามคำถาม
+              จะปรากฏที่นี่
+            </div>
+
+          </div>
+
+        `;
+
+            return;
+          }
+
+          /* Logs table */
+
+          container.innerHTML = `
+
+        <div
+          class="grid
+                 grid-cols-[1fr_120px_100px]
+                 bg-[#eef4eb]
+                 rounded-lg
+                 px-4 py-3
+                 text-xs
+                 text-gray-500"
+        >
+
+          <div>
+            คำถาม
+          </div>
+
+          <div>
+            เวลา
+          </div>
+
+          <div>
+            สถานะ
+          </div>
+
+        </div>
+
+
+        ${logs
+          .slice()
+          .reverse()
+          .map((log) => {
+            const question = log.question || log.query || "-";
+
+            const time = log.time || log.timestamp || "-";
+
+            const answer = log.answer || "";
+
+            const isError = Boolean(log.error);
+
+            const status = isError ? "error" : "success";
+
+            const statusClass = isError
+              ? "bg-red-50 text-red-600"
+              : "bg-green-50 text-green-700";
+
+            return `
+
+                  <div
+                    class="grid
+                           grid-cols-[1fr_120px_100px]
+                           items-center
+                           px-4 py-4
+                           border-b
+                           border-gray-100"
+                  >
+
+                    <div
+                      class="text-sm
+                             min-w-0"
+                    >
+
+                      <div
+                        class="font-medium
+                               break-words"
+                      >
+                        ${escapeHTML(question)}
+                      </div>
+
+
+                      ${
+                        answer
+                          ? `
+                            <div
+                              class="text-xs
+                                     text-gray-400
+                                     mt-1"
+                            >
+                              ${escapeHTML(answer)}
+                            </div>
+                          `
+                          : ""
+                      }
+
+                    </div>
+
+
+                    <div
+                      class="text-xs
+                             text-gray-500"
+                    >
+                      ${escapeHTML(time)}
+                    </div>
+
+
+                    <div>
+
+                      <span
+                        class="${statusClass}
+                               text-xs
+                               px-3 py-1
+                               rounded-full"
+                      >
+                        ${status}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                `;
+          })
+          .join("")}
+
+      `;
+        } catch (error) {
+          console.error("Question logs error:", error);
+
+          document.getElementById("questionCount").innerText = "0";
+
+          document.getElementById("questionSubtext").innerText =
+            "ยังไม่มีข้อมูล";
+
+          container.innerHTML = `
+
+        <div
+          class="text-center
+                 py-12"
+        >
+
+          <div
+            class="text-3xl
+                   mb-3"
+          >
+            💬
+          </div>
+
+
+          <div
+            class="font-semibold
+                   text-gray-500"
+          >
+            ยังไม่มีประวัติคำถาม
+          </div>
+
+
+          <div
+            class="text-xs
+                   text-gray-400
+                   mt-1"
+          >
+            ยังไม่มีข้อมูลจากนักเรียน
+          </div>
+
+        </div>
+
+      `;
+
+          renderFAQ([]);
+        }
+      }
+
+      /* ===========================================================
+     SERVER HEALTH CHECK
+  =========================================================== */
+
+      async function checkServerHealth() {
+        const dot = document.getElementById("serverStatusDot");
+        const title = document.getElementById("serverStatusTitle");
+        const detail = document.getElementById("serverStatusDetail");
+        const card = document.getElementById("serverStatusCard");
+        const btn = document.getElementById("btnTestServer");
+
+        if (!dot || !title || !detail) return;
+
+        dot.className =
+          "w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0 animate-pulse";
+        title.innerText = "กำลังทดสอบ...";
+        title.className = "text-xs font-semibold text-yellow-300 truncate";
+        detail.innerText = BASE_URL.replace(/^https?:\/\//, "");
+
+        if (btn) {
+          btn.classList.add("opacity-50", "pointer-events-none");
+        }
+
+        const startTime = Date.now();
+
+        try {
+          const response = await fetch(`${BASE_URL}/`, {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          });
+
+          const latency = Date.now() - startTime;
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0";
+          title.innerText = "🟢 ออนไลน์";
+          title.className = "text-xs font-semibold text-emerald-400 truncate";
+          detail.innerText = `เชื่อมต่อสำเร็จ (${latency} ms)`;
+
+          if (card) {
+            card.className =
+              "flex items-center gap-2.5 p-2.5 rounded-xl bg-[#142318] border border-emerald-800/60 transition-all";
+          }
+        } catch (error) {
+          console.warn("Server connection test error:", error);
+
+          dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0";
+          title.innerText = "🔴 เชื่อมต่อไม่ได้";
+          title.className = "text-xs font-semibold text-rose-400 truncate";
+          detail.innerText = "เซิร์ฟเวอร์ออฟไลน์";
+
+          if (card) {
+            card.className =
+              "flex items-center gap-2.5 p-2.5 rounded-xl bg-[#241517] border border-rose-900/60 transition-all";
+          }
+        } finally {
+          if (btn) {
+            btn.classList.remove("opacity-50", "pointer-events-none");
+          }
+        }
+      }
+
+      /* ===========================================================
+     INITIALIZE
+  =========================================================== */
+
+      function initialize() {
+        renderFiles();
+
+        renderLatestContent();
+
+        renderFAQ([]);
+
+        updateDashboard();
+
+        checkServerHealth();
+      }
+
+      initialize();
+    </script>
+
+    <!-- Authentication -->
+
+    <script src="auth.js"></script>
+
+    <!-- Dashboard User -->
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>
